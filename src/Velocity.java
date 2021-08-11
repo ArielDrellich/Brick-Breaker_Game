@@ -17,6 +17,7 @@ public class Velocity {
 
     /**
      * sets velocity based of angle and speed.
+     *
      * @param angle direction to move in
      * @param speed speed to move at
      * @return Velocity

@@ -1,36 +1,42 @@
+import java.awt.Color;
 import biuoop.DrawSurface;
-//import java.awt.Color;
 
 /**
  *
  * @author Ariel Drellich 328935275
  */
-public class Ball {
+public class Ball implements Sprite {
     private Point center;
     private int radius;
     private java.awt.Color color;
     private Velocity v;
+    private GameEnvironment gameEnvironment;
 
     /**
-     * @param center center of ball
-     * @param r radius of ball
-     * @param color color of ball
+     * @param center          center of ball
+     * @param r               radius of ball
+     * @param color           color of ball
+     * @param gameEnvironment placements of blocks on board
      */
-    public Ball(Point center, int r, java.awt.Color color) {
+    public Ball(Point center, int r, java.awt.Color color, GameEnvironment gameEnvironment) {
         this.center = center;
         this.radius = r;
         this.color = color;
+        this.gameEnvironment = gameEnvironment;
     }
+
     /**
-     * @param x x coordiante of center
-     * @param y y coordiante of center
-     * @param r radius of ball
-     * @param color color of ball
+     * @param x               x coordiante of center
+     * @param y               y coordiante of center
+     * @param r               radius of ball
+     * @param color           color of ball
+     * @param gameEnvironment placements of blocks on board
      */
-    public Ball(int x, int y, int r, java.awt.Color color) {
+    public Ball(int x, int y, int r, java.awt.Color color, GameEnvironment gameEnvironment) {
         this.center = new Point(x, y);
         this.radius = r;
         this.color = color;
+        this.gameEnvironment = gameEnvironment;
     }
 
     /**
@@ -70,6 +76,8 @@ public class Ball {
     public void drawOn(DrawSurface surface) {
         surface.setColor(color);
         surface.fillCircle((int) center.getX(), (int) center.getY(), radius);
+        surface.setColor(Color.BLACK);
+        surface.drawCircle((int) center.getX(), (int) center.getY(), radius);
     }
 
     /**
@@ -81,7 +89,7 @@ public class Ball {
     }
 
     /**
-     * sets the veloctiy of the ball.
+     * sets the velocity of the ball.
      * @param dx x velocity of ball
      * @param dy y velocity of ball
      */
@@ -97,29 +105,68 @@ public class Ball {
     }
 
     /**
-     * moves ball one frame forward according to speed and loaction.
-     */
-    public void moveOneStep() {
-        this.center = this.getVelocity().applyToPoint(this.center);
-    }
-
-    /**
      * moves the ball one frame forward according to its speed and location.
-     * @param width width of frame
-     * @param height height of frame
+     * @param width      width of frame
+     * @param height     height of frame
      * @param startPoint top left corner of frame
      */
     public void moveOneStep(int width, int height, Point startPoint) {
-        if ((int) (this.center.getX() + radius + this.getVelocity().getX())
-        > width + (int) startPoint.getX()
+        if ((int) (this.center.getX() + radius + this.getVelocity().getX()) > width + (int) startPoint.getX()
                 || (int) (this.center.getX() - radius + this.getVelocity().getX()) < startPoint.getX()) {
             setVelocity(-this.v.getX(), this.v.getY());
         }
-        if ((int) (this.center.getY() + radius + this.getVelocity().getY())
-        > height + (int) startPoint.getY()
+        if ((int) (this.center.getY() + radius + this.getVelocity().getY()) > height + (int) startPoint.getY()
                 || (int) (this.center.getY() - radius + this.getVelocity().getY()) < startPoint.getY()) {
             setVelocity(this.v.getX(), -this.v.getY());
         }
         this.center = this.getVelocity().applyToPoint(this.center);
+    }
+
+    /**
+     * Moves the ball to where it should be next frame.
+     */
+    public void moveOneStep() {
+        Point end = new Point(this.center.getX() + this.getVelocity().getX(),
+                this.center.getY() + this.getVelocity().getY());
+        Line trajectory = new Line(this.center, end);
+        if (gameEnvironment.getClosestCollision(trajectory) == null) {
+            this.center = this.getVelocity().applyToPoint(this.center);
+            return;
+        }
+        Point collisionPoint = gameEnvironment.getClosestCollision(trajectory).collisionPoint();
+        double xBack = collisionPoint.getX();
+        double yBack = collisionPoint.getY();
+        if (v.getX() != 0) {
+            if (this.getVelocity().getX() > 0) {
+                xBack = collisionPoint.getX() - 1;
+            } else {
+                xBack = collisionPoint.getX() + 1;
+            }
+        }
+        if (v.getY() != 0) {
+            if (this.getVelocity().getY() > 0) {
+                yBack = collisionPoint.getY() - 1;
+            } else {
+                yBack = collisionPoint.getY() + 1;
+            }
+        }
+        Point oneBack = new Point(xBack, yBack);
+        this.center = oneBack;
+        this.setVelocity(gameEnvironment.getClosestCollision(trajectory).collisionObject().hit(collisionPoint,
+                this.getVelocity()));
+    }
+
+    /**
+     * notifies the ball that time has passed and moves it accordingly.
+     */
+    public void timePassed() {
+        moveOneStep();
+    }
+
+    /**
+     * @param g game to add ball to
+     */
+    public void addToGame(Game g) {
+        g.addSprite(this);
     }
 }
