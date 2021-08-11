@@ -1,12 +1,16 @@
 import biuoop.DrawSurface;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Blocks for the game.
  */
-public class Block implements Collidable, Sprite {
+public class Block implements Collidable, Sprite, HitNotifier {
     private Rectangle rectangle;
     private Color color;
+    private List<HitListener> hitListeners;
 
     /**
      * constructor for the block.
@@ -16,6 +20,7 @@ public class Block implements Collidable, Sprite {
     public Block(Rectangle rectangle, Color color) {
         this.rectangle = rectangle;
         this.color = color;
+        this.hitListeners = new ArrayList<HitListener>();
     }
 
     /**
@@ -26,14 +31,24 @@ public class Block implements Collidable, Sprite {
     }
 
     /**
+     * Returns color of block.
+     * @return color of block.
+     */
+    public Color getColor() {
+        return color;
+    }
+
+    /**
      * Notify the object that we collided with it at collisionPoint with a given
      * velocity. The return is the new velocity expected after the hit (based on the
      * force the object inflicted on us).
      * @param collisionPoint of collision
      * @param currentVelocity     velocity of ball
+     * @param hitter ball thats hitting block
      * @return Velocity new velocity after collision
      */
-    public Velocity hit(Point collisionPoint, Velocity currentVelocity) {
+    public Velocity hit(Ball hitter, Point collisionPoint, Velocity currentVelocity) {
+        this.notifyHit(hitter);
         double vx = currentVelocity.getX();
         double vy = currentVelocity.getY();
         final double epsilon = 0.000001;
@@ -82,5 +97,43 @@ public class Block implements Collidable, Sprite {
     public void addToGame(Game g) {
         g.addSprite(this);
         g.addCollidable(this);
+    }
+
+    /**
+     * Removes object from game.
+     * @param game game to remove object from.
+     */
+    public void removeFromGame(Game game) {
+        game.removeSprite(this);
+        game.removeCollidable(this);
+    }
+
+    /**
+     * adds hit listener.
+     * @param hl hitlistener to add
+     */
+    public void addHitListener(HitListener hl) {
+        hitListeners.add(hl);
+    }
+
+    /**
+     * removes hitlistener.
+     * @param hl hitlistener to remove
+     */
+    public void removeHitListener(HitListener hl) {
+        hitListeners.remove(hl);
+    }
+
+    /**
+     * notifies hitting.
+     * @param hitter ball that hits the block.
+     */
+    private void notifyHit(Ball hitter) {
+        // Make a copy of the hitListeners before iterating over them.
+        List<HitListener> listeners = new ArrayList<HitListener>(this.hitListeners);
+        // Notify all listeners about a hit event:
+        for (HitListener hl : listeners) {
+            hl.hitEvent(this, hitter);
+        }
     }
 }

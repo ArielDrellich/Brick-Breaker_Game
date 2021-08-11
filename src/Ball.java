@@ -152,7 +152,7 @@ public class Ball implements Sprite {
         }
         Point oneBack = new Point(xBack, yBack);
         this.center = oneBack;
-        this.setVelocity(gameEnvironment.getClosestCollision(trajectory).collisionObject().hit(collisionPoint,
+        this.setVelocity(gameEnvironment.getClosestCollision(trajectory).collisionObject().hit(this, collisionPoint,
                 this.getVelocity()));
     }
 
@@ -168,5 +168,13 @@ public class Ball implements Sprite {
      */
     public void addToGame(Game g) {
         g.addSprite(this);
+    }
+
+    /**
+     * removes ball from game.
+     * @param g game to remove ball from.
+     */
+    public void removeFromGame(Game g) {
+        g.removeSprite(this);
     }
 }

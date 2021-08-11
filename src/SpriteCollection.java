@@ -15,10 +15,19 @@ public class SpriteCollection {
     }
 
     /**
+     * removes sprite from game.
+     * @param s sprite to remove.
+     */
+    public void removeSprite(Sprite s) {
+        sprites.remove(s);
+    }
+
+    /**
      * runs through list of sprites and calls the timePassed function on each.
      */
     public void notifyAllTimePassed() {
-        for (Sprite s : sprites) {
+        List<Sprite> sprite = new ArrayList<Sprite>(sprites);
+        for (Sprite s : sprite) {
             s.timePassed();
         }
     }

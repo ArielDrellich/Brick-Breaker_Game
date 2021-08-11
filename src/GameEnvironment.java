@@ -16,6 +16,14 @@ public class GameEnvironment {
     }
 
     /**
+     * Removes collidable from game environment.
+     * @param c collidable to remove.
+     */
+    public void removeCollidable(Collidable c) {
+        collidables.remove(c);
+    }
+
+    /**
      * @return List<Collidable> returns list of collidables in game.
      */
     public List<Collidable> getCollidablesList() {

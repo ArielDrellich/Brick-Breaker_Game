@@ -15,9 +15,10 @@ public interface Collidable {
      * force the object inflicted on us).
      * @param collisionPoint  point of collision
      * @param currentVelocity velocity of ball
+     * @param hitter ball thats hitting block
      * @return new velocity based on what it hit where.
      */
-    Velocity hit(Point collisionPoint, Velocity currentVelocity);
+    Velocity hit(Ball hitter, Point collisionPoint, Velocity currentVelocity);
 
     /**
      * @param surface to draw on

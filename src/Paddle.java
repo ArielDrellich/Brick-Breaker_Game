@@ -89,15 +89,19 @@ public class Paddle implements Sprite, Collidable {
     /**
      * @param collisionPoint  point of collision on the paddle.
      * @param currentVelocity velocity of the ball.
+     * @param hitter ball that's hitting.
      * @return Velocity new velocity based on where the ball hits.
      */
-    public Velocity hit(Point collisionPoint, Velocity currentVelocity) {
+    public Velocity hit(Ball hitter, Point collisionPoint, Velocity currentVelocity) {
         double fifthWidth = this.rectangle.getWidth() / 5;
         double speed = Math.sqrt(
                 currentVelocity.getX() * currentVelocity.getX() + currentVelocity.getY() * currentVelocity.getY());
         double angle = Math.atan2(currentVelocity.getY(), currentVelocity.getX());
         double roundedCollisionX = (double) ((int) (collisionPoint.getX() * 1000000)) / 1000000;
         double upperLeftX = this.rectangle.getUpperLeft().getX();
+        if (roundedCollisionX == upperLeftX || roundedCollisionX == upperLeftX + fifthWidth * 5) {
+            return new Velocity(-currentVelocity.getX(), currentVelocity.getY());
+        }
         if (roundedCollisionX >= upperLeftX && roundedCollisionX < upperLeftX + fifthWidth) {
             angle = 300;
         }
