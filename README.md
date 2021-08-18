@@ -3,7 +3,7 @@ Can easily be run through IntelliJ and other similar software.
 
 - Play classic brick breaker using just your arrow keys.
 - 4 Custom levels to play with more easily added.
-- Order of levels is set by command line arguments.
+    - Default play order is 1->2->3->4, but through command-line arugments can be set and arranged in any order.
 - Bouncing angle dependant on relative paddle position (sides bounce a sharper angle than middle).
 - Randomized Pink and Black blocks. Pink blocks give you an extra ball, whereas black blocks eat your ball. Watch out!
 - Press "P" to pause, and "space" to resume.
